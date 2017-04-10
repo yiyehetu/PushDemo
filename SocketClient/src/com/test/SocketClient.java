@@ -25,15 +25,13 @@ public class SocketClient {
 			socket = new Socket("127.0.0.1", 9999);
 			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			
+			startServerReplyListener(reader);
 			// 输入
 			String inputContent;
 			while (!(inputContent = inputReader.readLine()).equals("bye")) {
 				writer.write(inputContent + "\n");
 				writer.flush();
-				
-				// 接收
-				String msg = reader.readLine();
-				System.out.println(msg);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -68,6 +66,24 @@ public class SocketClient {
 			}
 		}
 
+	}
+	
+	// 接收数据监听
+	private void startServerReplyListener(final BufferedReader reader){
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				String response;
+				try {
+					while((response = reader.readLine()) != null){
+						System.out.println(response);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		}).start();
 	}
 
 }
